@@ -1,0 +1,11 @@
+version: 0.1
+
+extrinsic_path: ./extrinsic/
+
+intrinsic_path: ./intrinsic/
+
+dst_img_path: ./picture/
+
+bev_source_img_path: /home/silencht/Videos/BeVis/SurroundImages/
+
+bev_img_path: /home/silencht/Videos/BeVis/BevImages/
