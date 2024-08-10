@@ -64,26 +64,26 @@ Bevis_calib
 
 1. 选择相信BeVis数据集标定结果中的内参数据（内参数K&D已经嵌入calibev.py程序中）（./BeVIS/CalibrationData/CalibResults/CalibResults/surround-view-system/intrinsics.xml）
 
-2. extrinsic中的图片来源于./Bevis/CalibrationData/extrinCalib-1/Surround-view System/surround-view system文件夹，根据图像命名的方向信息分类放入./calibev/extrinsic/Back & Front & Left & Right四个文件夹。 其实，目前标定脚本程序中实际只使用了相同时间戳的一组图片（前后左右四张）
+2. extrinsic中的图片来源于./Bevis/CalibrationData/extrinCalib-1/Surround-view System/surround-view system文件夹，根据图像命名的方向信息分类放入./avm_extrinsic_calibration/extrinsic/Back & Front & Left & Right四个文件夹。 其实，目前标定脚本程序中实际只使用了相同时间戳的一组图片（前后左右四张）
 
 3. dst.jpg为640*640像素图，对应数据集车辆四周地面铺设的10米 \* 10米棋盘格标定布（每个格子长度为1米）（论文有描述）。该图片使用[draw.io](https://draw.io)软件绘制生成。
 
 4. **在主目录下运行脚本程序**，例如：
 
    ```bash
-   silencht@ubuntu:~/calibev$ python3 calibev.py
+   silencht@ubuntu:~/avm_extrinsic_calibration$ python3 calibev.py
    ```
 
    程序流程如下：
 
-   1. 首先，程序检查./calibev/extrinsic/Back & Front & Left & Right四个文件夹内图片之前是否去畸变，如果没有去畸变，那么执行去畸变，并将去畸变图片保存至./calibev/extrinsic/undistor_Back/Fr\*/Le\*/Ri\*中。该过程中，同时会保存四路相机内参文件至./calib/intrinsic/（如front_D.npy，front_K.npy）（内参和畸变参数来源于BeVis数据集原始数据）。
+   1. 首先，程序检查./avm_extrinsic_calibration/extrinsic/Back & Front & Left & Right四个文件夹内图片之前是否去畸变，如果没有去畸变，那么执行去畸变，并将去畸变图片保存至./avm_extrinsic_calibration/extrinsic/undistor_Back/Fr\*/Le\*/Ri\*中。该过程中，同时会保存四路相机内参文件至./calib/intrinsic/（如front_D.npy，front_K.npy）（内参和畸变参数来源于BeVis数据集原始数据）。
    2. 其次，开始标定相机外参。暂只选取一组（前后左右共四张）图片进行手动标定来计算去畸变后相机原图与目标俯视图片（即./picture/dst.jpg）的单应性矩阵（矩阵包含外参R&t）。使用鼠标在去畸变原图上选取合适数量的棋盘格角点之后（大于等于4个），按空格跳出，然后使用鼠标在目标俯视图片再次点选对应匹配的角点，同样按空格结束。该步骤，前后左右四组图片共重复四次。【由于数据集的图片名称方向标识错误，因此在选取目标俯视图片的对应匹配角点时，需参照命令行中输出的真实方向（truth directory）进行点选。】最终完成后，会保存四路相机外参文件至./calib/extrinsic/（如back_H.npy）
-   3. 最后，进行BEV拼接。读取calibev.yaml中bev_source_img_path下的四路鱼眼图片及汽车填充图./calibev/picture/car.png，使用四路相机内外参（K、D、H）生成映射map矩阵。最终输出融合拼接过后的BEV俯视效果图至calibev.yaml中bev_img_path路径下。
+   3. 最后，进行BEV拼接。读取calibev.yaml中bev_source_img_path下的四路鱼眼图片及汽车填充图./avm_extrinsic_calibration/picture/car.png，使用四路相机内外参（K、D、H）生成映射map矩阵。最终输出融合拼接过后的BEV俯视效果图至calibev.yaml中bev_img_path路径下。
 
 5. 完整程序流程输入+输出示例如下
 
 ```bash
-silencht@ubuntu:~/calibev$ python3 calibev.py 
+silencht@ubuntu:~/avm_extrinsic_calibration$ python3 calibev.py 
 {'version': 0.1, 'extrinsic_path': './extrinsic/', 'intrinsic_path': './intrinsic/', 'dst_img_path': './picture/', 'bev_source_img_path': '/home/silencht/Videos/BeVis/SurroundImages/', 'bev_img_path': '/home/silencht/Videos/BeVis/BevImages/'}
 mkdir undistor_img_save filefolder success!
 bev_img_path filefolder is exists.
@@ -194,10 +194,10 @@ Remap Completed.
 
 ##### 2.3 decomposeH tools
 
-decomposeH.py脚本程序可以将./calibev/extrinsic/下的back_H.npy等外参文件转换分解为四组旋转和平移矩阵结果（详见《视觉SLAM十四讲》单应性矩阵相关内容）。输出结果如下所示例：
+decomposeH.py脚本程序可以将./avm_extrinsic_calibration/extrinsic/下的back_H.npy等外参文件转换分解为四组旋转和平移矩阵结果（详见《视觉SLAM十四讲》单应性矩阵相关内容）。输出结果如下所示例：
 
 ```bash
-silencht@ubuntu:~/calibev$ python3 decomposeH.py
+silencht@ubuntu:~/avm_extrinsic_calibration$ python3 decomposeH.py
 [[ 9.86564375e-02 -7.89359033e-01  2.45322812e+02]
  [-3.97158701e-02 -1.08425352e+00  4.13379297e+02]
  [-9.27517179e-05 -2.41620887e-03  1.00000000e+00]]
